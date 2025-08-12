@@ -86,7 +86,40 @@
       console.warn("MetaMask not detected.");
       walletStatus.innerText = 'MetaMask not detected. Please install it.';
     }
-  });
+  });const contractAddress = "0xYourContractAddressHere"; // Replace with actual address
+const contractABI = [ /* Paste ABI here */ ]; // Replace with actual ABI
+
+const connectButton = document.getElementById('connectButton');
+const affirmationSection = document.getElementById('affirmationSection');
+const valuesForm = document.getElementById('valuesForm');
+const confirmationMessage = document.getElementById('confirmationMessage');
+
+connectButton.addEventListener('click', async () => {
+  if (typeof window.ethereum !== 'undefined') {
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    affirmationSection.style.display = 'block';
+  } else {
+    alert("MetaMask not detected.");
+  }
+});
+
+valuesForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+  try {
+    const tx = await contract.affirmValues();
+    await tx.wait();
+    confirmationMessage.style.display = 'block';
+  } catch (err) {
+    console.error(err);
+    alert("Transaction failed or already affirmed.");
+  }
+});
+     
 </script>
 </body>
 </html>
