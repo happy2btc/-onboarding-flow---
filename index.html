@@ -38,7 +38,17 @@
   <h1>🌟 Welcome to the New Paradigm Friendship Community</h1>
   <button id="connectButton">🔗 Connect Wallet</button>
   <p id="walletStatus">Please connect your wallet to begin.</p>
-
+<div id="affirmationSection" style="display:none;">
+  <h2>✅ You're In!</h2>
+  <p>Please affirm our shared values:</p>
+  <form id="valuesForm">
+    <label><input type="checkbox" required /> I commit to authenticity</label><br>
+    <label><input type="checkbox" required /> I commit to collaboration</label><br>
+    <label><input type="checkbox" required /> I commit to growth</label><br>
+    <button type="submit">Affirm & Continue</button>
+  </form>
+  <p id="confirmationMessage" style="display:none; color: green;">✅ Values affirmed successfully!</p>
+</div>
   <div id="nextStep">
     <h2>✅ You're In!</h2>
     <p>Next: Affirm our shared values to continue onboarding.</p>
