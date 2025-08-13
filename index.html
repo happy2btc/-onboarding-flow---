@@ -19,6 +19,10 @@
       border-radius: 8px;
       cursor: pointer;
     }
+    #connectButton:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
     #walletStatus {
       margin-top: 20px;
       font-size: 16px;
@@ -32,6 +36,9 @@
       margin-top: 20px;
       color: green;
       font-weight: bold;
+    }
+    button:disabled {
+      opacity: 0.6;
     }
   </style>
 </head>
@@ -54,7 +61,7 @@
   </div>
 
   <script>
-    const contractAddress = "0x1234567890abcdef1234567890abcdef12345678"; // Replace with real address
+    const contractAddress = "0x1234567890abcdef1234567890abcdef12345678"; // Replace with your contract address
     const contractABI = [
       {
         "inputs": [],
@@ -73,6 +80,9 @@
 
     connectButton.addEventListener('click', async () => {
       if (typeof window.ethereum !== 'undefined') {
+        connectButton.disabled = true;
+        connectButton.innerText = '🔄 Connecting...';
+
         try {
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
           walletStatus.innerText = `Connected: ${accounts[0]}`;
@@ -80,6 +90,9 @@
         } catch (error) {
           console.error("Connection error:", error);
           walletStatus.innerText = 'Connection failed.';
+        } finally {
+          connectButton.disabled = false;
+          connectButton.innerText = '🔗 Connect Wallet';
         }
       } else {
         walletStatus.innerText = 'MetaMask not detected. Please install it.';
@@ -88,6 +101,10 @@
 
     valuesForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      const submitButton = valuesForm.querySelector('button');
+      submitButton.disabled = true;
+      submitButton.innerText = '🔄 Affirming...';
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
@@ -100,6 +117,9 @@
       } catch (err) {
         console.error(err);
         alert("Transaction failed or already affirmed.");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.innerText = 'Affirm & Continue';
       }
     });
   </script>
