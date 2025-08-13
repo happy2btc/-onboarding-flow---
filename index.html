@@ -1,4 +1,4 @@
-R<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
@@ -61,7 +61,10 @@ R<!DOCTYPE html>
   </div>
 
   <script>
-    const contractAddress = "0x1234567890abcdef1234567890abcdef12345678"; // Replace with your contract address
+    // Replace with your actual deployed contract address
+    const contractAddress = "0x1234567890abcdef1234567890abcdef12345678";
+
+    // Replace with your actual ABI
     const contractABI = [
       {
         "inputs": [],
@@ -87,6 +90,11 @@ R<!DOCTYPE html>
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
           walletStatus.innerText = `Connected: ${accounts[0]}`;
           affirmationSection.style.display = 'block';
+
+          // Optional: Check network
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const network = await provider.getNetwork();
+          console.log("Connected to network:", network.name);
         } catch (error) {
           console.error("Connection error:", error);
           walletStatus.innerText = 'Connection failed.';
