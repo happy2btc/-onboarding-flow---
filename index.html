@@ -10,7 +10,6 @@
       padding-top: 100px;
       background: #f0f4f8;
     }
-
     #connectButton {
       background: #2a7f62;
       color: white;
@@ -20,16 +19,19 @@
       border-radius: 8px;
       cursor: pointer;
     }
-
     #walletStatus {
       margin-top: 20px;
       font-size: 16px;
       color: #333;
     }
-
-    #nextStep {
+    #affirmationSection {
       display: none;
       margin-top: 40px;
+    }
+    #confirmationMessage {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -38,88 +40,68 @@
   <h1>🌟 Welcome to the New Paradigm Friendship Community</h1>
   <button id="connectButton">🔗 Connect Wallet</button>
   <p id="walletStatus">Please connect your wallet to begin.</p>
-<div id="affirmationSection" style="display:none;">
-  <h2>✅ You're In!</h2>
-  <p>Please affirm our shared values:</p>
-  <form id="valuesForm">
-    <label><input type="checkbox" required /> I commit to authenticity</label><br>
-    <label><input type="checkbox" required /> I commit to collaboration</label><br>
-    <label><input type="checkbox" required /> I commit to growth</label><br>
-    <button type="submit">Affirm & Continue</button>
-  </form>
-  <p id="confirmationMessage" style="display:none; color: green;">✅ Values affirmed successfully!</p>
-</div>
-  <div id="nextStep">
+
+  <div id="affirmationSection">
     <h2>✅ You're In!</h2>
-    <p>Next: Affirm our shared values to continue onboarding.</p>
+    <p>Please affirm our shared values:</p>
+    <form id="valuesForm">
+      <label><input type="checkbox" required /> I commit to authenticity</label><br>
+      <label><input type="checkbox" required /> I commit to collaboration</label><br>
+      <label><input type="checkbox" required /> I commit to growth</label><br>
+      <button type="submit">Affirm & Continue</button>
+    </form>
+    <p id="confirmationMessage" style="display:none;">✅ Values affirmed successfully!</p>
   </div>
-<form id="valuesForm">
-  <p>Please affirm the values that guide our community:</p>
-  <label><input type="checkbox" name="authenticity" /> I value authentic connection</label><br>
-  <label><input type="checkbox" name="growth" /> I commit to collaborative growth</label><br>
-  <label><input type="checkbox" name="respect" /> I honor mutual respect and transparency</label><br>
-  <button type="submit">Affirm & Continue</button>
-</form>
 
-   <script>
-  const connectButton = document.getElementById('connectButton');
-  const walletStatus = document.getElementById('walletStatus');
-  const nextStep = document.getElementById('nextStep');
-
-  console.log("Script loaded. Checking for MetaMask...");
-
-  connectButton.addEventListener('click', async () => {
-    console.log("Connect button clicked.");
-
-    if (typeof window.ethereum !== 'undefined') {
-      console.log("MetaMask detected.");
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        console.log("Accounts:", accounts);
-        walletStatus.innerText = `Connected: ${accounts[0]}`;
-        nextStep.style.display = 'block';
-      } catch (error) {
-        console.error("Connection error:", error);
-        walletStatus.innerText = 'Connection failed.';
+  <script>
+    const contractAddress = "0x1234567890abcdef1234567890abcdef12345678"; // Replace with real address
+    const contractABI = [
+      {
+        "inputs": [],
+        "name": "affirmValues",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
       }
-    } else {
-      console.warn("MetaMask not detected.");
-      walletStatus.innerText = 'MetaMask not detected. Please install it.';
-    }
-  });const contractAddress = "0xYourContractAddressHere"; // Replace with actual address
-const contractABI = [ /* Paste ABI here */ ]; // Replace with actual ABI
+    ];
 
-const connectButton = document.getElementById('connectButton');
-const affirmationSection = document.getElementById('affirmationSection');
-const valuesForm = document.getElementById('valuesForm');
-const confirmationMessage = document.getElementById('confirmationMessage');
+    const connectButton = document.getElementById('connectButton');
+    const walletStatus = document.getElementById('walletStatus');
+    const affirmationSection = document.getElementById('affirmationSection');
+    const valuesForm = document.getElementById('valuesForm');
+    const confirmationMessage = document.getElementById('confirmationMessage');
 
-connectButton.addEventListener('click', async () => {
-  if (typeof window.ethereum !== 'undefined') {
-    await window.ethereum.request({ method: 'eth_requestAccounts' });
-    affirmationSection.style.display = 'block';
-  } else {
-    alert("MetaMask not detected.");
-  }
-});
+    connectButton.addEventListener('click', async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          walletStatus.innerText = `Connected: ${accounts[0]}`;
+          affirmationSection.style.display = 'block';
+        } catch (error) {
+          console.error("Connection error:", error);
+          walletStatus.innerText = 'Connection failed.';
+        }
+      } else {
+        walletStatus.innerText = 'MetaMask not detected. Please install it.';
+      }
+    });
 
-valuesForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
+    valuesForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-  try {
-    const tx = await contract.affirmValues();
-    await tx.wait();
-    confirmationMessage.style.display = 'block';
-  } catch (err) {
-    console.error(err);
-    alert("Transaction failed or already affirmed.");
-  }
-});
-     
-</script>
+      try {
+        const tx = await contract.affirmValues();
+        await tx.wait();
+        confirmationMessage.style.display = 'block';
+      } catch (err) {
+        console.error(err);
+        alert("Transaction failed or already affirmed.");
+      }
+    });
+  </script>
 </body>
 </html>
