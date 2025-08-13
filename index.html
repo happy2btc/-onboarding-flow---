@@ -29,7 +29,7 @@
     <h2>Affirm Your Values</h2>
     <form id="affirmForm">
       <label>
-        <input type="checkbox" required />
+        <input type="checkbox" id="valuesCheckbox" required />
         I affirm the values of authenticity, collaboration, and belonging.
       </label>
       <br />
@@ -63,11 +63,12 @@
         await provider.send("eth_requestAccounts", []);
         signer = provider.getSigner();
 
-        // Replace with your actual contract address and ABI
+        // ✅ Replace with your actual contract address and ABI
         const contractAddress = "0xYourContractAddressHere";
         const contractABI = [
-          // Replace with your actual ABI
-          "function affirmValues() public"
+          "function affirmValues() public",
+          "function hasAffirmed(address) view returns (bool)",
+          "event ValuesAffirmed(address indexed member)"
         ];
 
         contract = new ethers.Contract(contractAddress, contractABI, signer);
@@ -76,19 +77,26 @@
         affirmationSection.classList.remove("hidden");
       } catch (error) {
         console.error("Connection error:", error);
+        alert("Failed to connect wallet.");
       }
     });
 
     affirmForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      try {
-        // Call your smart contract function (no ETH sent)
-        await contract.affirmValues();
+      const checkbox = document.getElementById("valuesCheckbox");
 
+      if (!checkbox.checked) {
+        alert("Please affirm the values to continue.");
+        return;
+      }
+
+      try {
+        await contract.affirmValues(); // ⛓️ On-chain call
         affirmationSection.classList.add("hidden");
         successMessage.classList.remove("hidden");
       } catch (error) {
         console.error("Affirmation error:", error);
+        alert("Transaction failed. Please try again.");
       }
     });
   </script>
