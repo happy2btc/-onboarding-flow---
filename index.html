@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Connect Wallet</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -59,77 +60,76 @@
     <p id="confirmationMessage" style="display:none;">✅ Values affirmed successfully!</p>
   </div>
 
-  <!-- Load ethers.js before your script -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
   <script>
-    // Replace with your actual deployed contract address
-    const contractAddress = "0x1234567890abcdef1234567890abcdef12345678";
+    window.addEventListener('DOMContentLoaded', () => {
+      // Replace with your actual deployed contract address
+      const contractAddress = "0x1234567890abcdef1234567890abcdef12345678";
 
-    // Replace with your actual ABI
-    const contractABI = [
-      {
-        "inputs": [],
-        "name": "affirmValues",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      }
-    ];
+      // Replace with your actual ABI
+      const contractABI = [
+        {
+          "inputs": [],
+          "name": "affirmValues",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ];
 
-    const connectButton = document.getElementById('connectButton');
-    const walletStatus = document.getElementById('walletStatus');
-    const affirmationSection = document.getElementById('affirmationSection');
-    const valuesForm = document.getElementById('valuesForm');
-    const confirmationMessage = document.getElementById('confirmationMessage');
+      const connectButton = document.getElementById('connectButton');
+      const walletStatus = document.getElementById('walletStatus');
+      const affirmationSection = document.getElementById('affirmationSection');
+      const valuesForm = document.getElementById('valuesForm');
+      const confirmationMessage = document.getElementById('confirmationMessage');
 
-    connectButton.addEventListener('click', async () => {
-      if (typeof window.ethereum !== 'undefined') {
-        connectButton.disabled = true;
-        connectButton.innerText = '🔄 Connecting...';
+      connectButton.addEventListener('click', async () => {
+        if (typeof window.ethereum !== 'undefined') {
+          connectButton.disabled = true;
+          connectButton.innerText = '🔄 Connecting...';
+
+          try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            walletStatus.innerText = `Connected: ${accounts[0]}`;
+            affirmationSection.style.display = 'block';
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const network = await provider.getNetwork();
+            console.log("Connected to network:", network.name);
+          } catch (error) {
+            console.error("Connection error:", error);
+            walletStatus.innerText = 'Connection failed.';
+          } finally {
+            connectButton.disabled = false;
+            connectButton.innerText = '🔗 Connect Wallet';
+          }
+        } else {
+          walletStatus.innerText = 'MetaMask not detected. Please install it.';
+        }
+      });
+
+      valuesForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitButton = valuesForm.querySelector('button');
+        submitButton.disabled = true;
+        submitButton.innerText = '🔄 Affirming...';
 
         try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          walletStatus.innerText = `Connected: ${accounts[0]}`;
-          affirmationSection.style.display = 'block';
-
-          // Optional: Check network
           const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const network = await provider.getNetwork();
-          console.log("Connected to network:", network.name);
-        } catch (error) {
-          console.error("Connection error:", error);
-          walletStatus.innerText = 'Connection failed.';
+          const signer = provider.getSigner();
+          const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+          const tx = await contract.affirmValues();
+          await tx.wait();
+          confirmationMessage.style.display = 'block';
+        } catch (err) {
+          console.error(err);
+          alert("Transaction failed or already affirmed.");
         } finally {
-          connectButton.disabled = false;
-          connectButton.innerText = '🔗 Connect Wallet';
+          submitButton.disabled = false;
+          submitButton.innerText = 'Affirm & Continue';
         }
-      } else {
-        walletStatus.innerText = 'MetaMask not detected. Please install it.';
-      }
-    });
-
-    valuesForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const submitButton = valuesForm.querySelector('button');
-      submitButton.disabled = true;
-      submitButton.innerText = '🔄 Affirming...';
-
-      try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-        const tx = await contract.affirmValues();
-        await tx.wait();
-        confirmationMessage.style.display = 'block';
-      } catch (err) {
-        console.error(err);
-        alert("Transaction failed or already affirmed.");
-      } finally {
-        submitButton.disabled = false;
-        submitButton.innerText = 'Affirm & Continue';
-      }
+      });
     });
   </script>
 </body>
