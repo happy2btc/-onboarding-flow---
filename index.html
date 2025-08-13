@@ -1,137 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>New Paradigm Onboarding</title>
-  <!-- Load ethers.js early -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
     body {
-      font-family: sans-serif;
-      text-align: center;
-      padding-top: 100px;
-      background: #f0f4f8;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f4f4f4;
     }
-    #connectButton {
-      background: #2a7f62;
-      color: white;
-      padding: 15px 30px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      margin-top: 1rem;
     }
-    #connectButton:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
-    #walletStatus {
-      margin-top: 20px;
-      font-size: 16px;
-      color: #333;
-    }
-    #affirmationSection {
+    .hidden {
       display: none;
-      margin-top: 40px;
-    }
-    #confirmationMessage {
-      margin-top: 20px;
-      color: green;
-      font-weight: bold;
-    }
-    button:disabled {
-      opacity: 0.6;
     }
   </style>
 </head>
 <body>
+  <h1>Welcome to the New Paradigm Friendship Community</h1>
+  <p>Please connect your wallet to begin onboarding.</p>
+  <button id="connectWallet">Connect Wallet</button>
 
-  <h1>🌟 Welcome to the New Paradigm Friendship Community</h1>
-  <button id="connectButton">🔗 Connect Wallet</button>
-  <p id="walletStatus">Please connect your wallet to begin.</p>
-
-  <div id="affirmationSection">
-    <h2>✅ You're In!</h2>
-    <p>Please affirm our shared values:</p>
-    <form id="valuesForm">
-      <label><input type="checkbox" required /> I commit to authenticity</label><br>
-      <label><input type="checkbox" required /> I commit to collaboration</label><br>
-      <label><input type="checkbox" required /> I commit to growth</label><br>
+  <div id="affirmationSection" class="hidden">
+    <h2>Affirm Your Values</h2>
+    <form id="affirmForm">
+      <label>
+        <input type="checkbox" required />
+        I affirm the values of authenticity, collaboration, and belonging.
+      </label>
+      <br />
       <button type="submit">Affirm & Continue</button>
     </form>
-    <p id="confirmationMessage" style="display:none;">✅ Values affirmed successfully!</p>
   </div>
 
-  <!-- Your JavaScript runs only after everything is loaded -->
+  <div id="successMessage" class="hidden">
+    <h2>You're In!</h2>
+    <p>Welcome to the community. Your wallet is connected and your values affirmed.</p>
+  </div>
+
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      // Replace with your actual deployed contract address
-      const contractAddress = "0x1234567890abcdef1234567890abcdef12345678";
+    let provider;
+    let signer;
+    let contract;
 
-      // Replace with your actual ABI
-      const contractABI = [
-        {
-          "inputs": [],
-          "name": "affirmValues",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
+    const connectButton = document.getElementById("connectWallet");
+    const affirmationSection = document.getElementById("affirmationSection");
+    const affirmForm = document.getElementById("affirmForm");
+    const successMessage = document.getElementById("successMessage");
+
+    connectButton.addEventListener("click", async () => {
+      try {
+        if (!window.ethereum) {
+          alert("MetaMask is not installed.");
+          return;
         }
-      ];
 
-      const connectButton = document.getElementById('connectButton');
-      const walletStatus = document.getElementById('walletStatus');
-      const affirmationSection = document.getElementById('affirmationSection');
-      const valuesForm = document.getElementById('valuesForm');
-      const confirmationMessage = document.getElementById('confirmationMessage');
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
 
-      connectButton.addEventListener('click', async () => {
-        if (typeof window.ethereum !== 'undefined') {
-          connectButton.disabled = true;
-          connectButton.innerText = '🔄 Connecting...';
+        // Replace with your actual contract address and ABI
+        const contractAddress = "0xYourContractAddressHere";
+        const contractABI = [
+          // Replace with your actual ABI
+          "function affirmValues() public"
+        ];
 
-          try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            walletStatus.innerText = `Connected: ${accounts[0]}`;
-            affirmationSection.style.display = 'block';
+        contract = new ethers.Contract(contractAddress, contractABI, signer);
 
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const network = await provider.getNetwork();
-            console.log("Connected to network:", network.name);
-          } catch (error) {
-            console.error("Connection error:", error);
-            walletStatus.innerText = 'Connection failed.';
-          } finally {
-            connectButton.disabled = false;
-            connectButton.innerText = '🔗 Connect Wallet';
-          }
-        } else {
-          walletStatus.innerText = 'MetaMask not detected. Please install it.';
-        }
-      });
+        connectButton.classList.add("hidden");
+        affirmationSection.classList.remove("hidden");
+      } catch (error) {
+        console.error("Connection error:", error);
+      }
+    });
 
-      valuesForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    affirmForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        // Call your smart contract function (no ETH sent)
+        await contract.affirmValues();
 
-        const submitButton = valuesForm.querySelector('button');
-        submitButton.disabled = true;
-        submitButton.innerText = '🔄 Affirming...';
-
-        try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const signer = provider.getSigner();
-          const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-          const tx = await contract.affirmValues();
-          await tx.wait();
-          confirmationMessage.style.display = 'block';
-        } catch (err) {
-          console.error(err);
-          alert("Transaction failed or already affirmed.");
-        } finally {
-          submitButton.disabled = false;
-          submitButton.innerText = 'Affirm & Continue';
-        }
-      });
+        affirmationSection.classList.add("hidden");
+        successMessage.classList.remove("hidden");
+      } catch (error) {
+        console.error("Affirmation error:", error);
+      }
     });
   </script>
 </body>
