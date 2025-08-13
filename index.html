@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -10,20 +9,20 @@
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f0fdf4;
+      background-color: #e6fffa;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
 
-    .container {
+    .box {
       background-color: #d1fae5;
       border: 2px solid #10b981;
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 2rem;
+      width: 90%;
       max-width: 500px;
-      width: 100%;
       text-align: center;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
@@ -35,7 +34,7 @@
 
     p {
       color: #065f46;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
     }
 
     button {
@@ -64,15 +63,15 @@
 
     label {
       display: block;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
       color: #065f46;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="box">
     <h1>Welcome to the New Paradigm</h1>
-    <p>We’re building a space for authenticity, collaboration, and belonging. Let’s begin.</p>
+    <p>Connect your wallet and affirm your values to join our community.</p>
 
     <button id="connectWallet">Connect Wallet</button>
 
@@ -80,9 +79,9 @@
       <h2>Affirm Your Values</h2>
       <form id="affirmForm">
         <div class="checkbox-group">
-          <label><input type="checkbox" name="value1" required /> I value authenticity in how I show up.</label>
-          <label><input type="checkbox" name="value2" required /> I believe in collaboration over competition.</label>
-          <label><input type="checkbox" name="value3" required /> I commit to creating belonging for others.</label>
+          <label><input type="checkbox" name="authenticity" required /> I value authenticity in how I show up.</label>
+          <label><input type="checkbox" name="collaboration" required /> I believe in collaboration over competition.</label>
+          <label><input type="checkbox" name="belonging" required /> I commit to creating belonging for others.</label>
         </div>
         <button type="submit">Affirm & Join</button>
       </form>
