@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
   <title>Connect Wallet</title>
   <style>
     body {
@@ -60,6 +59,8 @@
     <p id="confirmationMessage" style="display:none;">✅ Values affirmed successfully!</p>
   </div>
 
+  <!-- Load ethers.js before your script -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
   <script>
     // Replace with your actual deployed contract address
     const contractAddress = "0x1234567890abcdef1234567890abcdef12345678";
@@ -114,11 +115,11 @@
       submitButton.disabled = true;
       submitButton.innerText = '🔄 Affirming...';
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
       try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
         const tx = await contract.affirmValues();
         await tx.wait();
         confirmationMessage.style.display = 'block';
