@@ -2,138 +2,124 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>New Paradigm Onboarding</title>
-  <script src="https://cdn.jsdelivr.net/npm/near-api-js/dist/near-api-js.min.js"></script>
   <style>
     body {
-      background-color: #d4edda;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
+      font-family: sans-serif;
+      background: #f0fff4;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-
     .onboarding-box {
-      background-color: #a9dfbf;
+      background: white;
       padding: 2rem;
       border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 500px;
-      margin-top: 5rem;
+      max-width: 400px;
     }
-
-    .affirm-button, #sendButton {
-      background-color: #28a745;
+    .affirm-button {
+      background-color: #38a169;
       color: white;
-      padding: 0.75rem 1.5rem;
-      font-size: 1.1rem;
       border: none;
+      padding: 0.75rem 1.5rem;
       border-radius: 8px;
       cursor: pointer;
       margin-top: 1rem;
     }
-
     .hidden {
       display: none;
     }
-
-    #guestBookScreen {
-      text-align: center;
-      margin-top: 3rem;
-      width: 90%;
-      max-width: 500px;
-    }
-
-    textarea {
+    input {
+      padding: 0.5rem;
       width: 100%;
-      padding: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
       margin-top: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
-  <!-- Affirmation Screen -->
-  <div id="affirmationScreen">
+  <!-- Wallet Connection Screen -->
+  <div id="walletScreen">
     <div class="onboarding-box">
       <h1>Welcome to the New Paradigm</h1>
-      <p>We're building a space for authenticity, collaboration, and belonging.<br>Let's begin.</p>
+      <p>Connect your wallet and affirm your values to join our community.</p>
+      <button id="connectWallet" class="affirm-button">Connect MetaMask</button>
+    </div>
+  </div>
 
+  <!-- Affirmation Screen -->
+  <div id="affirmationScreen" class="hidden">
+    <div class="onboarding-box">
       <h2>Affirm Your Values</h2>
-      <form id="affirmationForm">
-        <label><input type="checkbox" checked disabled /> I value authenticity in how I show up.</label><br><br>
-        <label><input type="checkbox" checked disabled /> I believe in collaboration over competition.</label><br><br>
-        <label><input type="checkbox" checked disabled /> I commit to creating belonging for others.</label><br><br>
-        <button type="submit" class="affirm-button">Affirm & Join</button>
-      </form>
+      <p>We believe in kindness, collaboration, and authenticity. Do you affirm these values?</p>
+      <button id="affirmYes" class="affirm-button">I Affirm</button>
     </div>
   </div>
 
   <!-- Guest Book Screen -->
   <div id="guestBookScreen" class="hidden">
-    <h2>Leave an Affirmation, Greeting, or Message</h2>
-    <textarea id="messageInput" rows="4" placeholder="Your message..."></textarea><br>
-    <button id="sendButton">Send</button>
-    <div id="messages"></div>
+    <div class="onboarding-box">
+      <h2>Guest Book</h2>
+      <form id="guestBookForm">
+        <input type="text" id="message" placeholder="Leave a message..." required />
+        <button type="submit" class="affirm-button">Sign Guest Book</button>
+      </form>
+    </div>
   </div>
 
+  <!-- ethers.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+
   <script>
-    // Transition from affirmation to guest book
-    document.getElementById("affirmationForm").addEventListener("submit", function(e) {
+    const contractAddress = "YOUR_CONTRACT_ADDRESS"; // Replace with your deployed address
+
+    const abi = [/* Paste your ABI array here */];
+
+    let provider, signer, contract;
+
+    window.onload = async () => {
+      if (window.ethereum) {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+        contract = new ethers.Contract(contractAddress, abi, signer);
+      } else {
+        alert("MetaMask not detected. Please install it to continue.");
+      }
+    };
+
+    document.getElementById("connectWallet").onclick = async () => {
+      await provider.send("eth_requestAccounts", []);
+      document.getElementById("walletScreen").classList.add("hidden");
+      document.getElementById("affirmationScreen").classList.remove("hidden");
+    };
+
+    document.getElementById("affirmYes").onclick = async () => {
+      try {
+        await contract.affirmValues();
+        document.getElementById("affirmationScreen").classList.add("hidden");
+        document.getElementById("guestBookScreen").classList.remove("hidden");
+      } catch (err) {
+        alert("Already affirmed or error occurred.");
+      }
+    };
+
+    document.getElementById("guestBookForm").onsubmit = async (e) => {
       e.preventDefault();
-      document.getElementById("affirmationScreen").classList.add("hidden");
-      document.getElementById("guestBookScreen").classList.remove("hidden");
-    });
-
-    // NEAR config
-    const nearConfig = {
-      networkId: "testnet",
-      nodeUrl: "https://rpc.testnet.near.org",
-      walletUrl: "https://testnet.mynearwallet.com",
-      helperUrl: "https://helper.testnet.near.org",
-      contractName: "guestbook.thomas.testnet" // 🔁 Replace with your actual contract name
+      const message = document.getElementById("message").value;
+      try {
+        await contract.signGuestBook(message);
+        document.getElementById("message").value = "";
+        alert("Message signed!");
+      } catch (err) {
+        alert("Please affirm values before signing.");
+      }
     };
-
-    async function initNear() {
-      const near = await nearApi.connect({
-        deps: { keyStore: new nearApi.keyStores.BrowserLocalStorageKeyStore() },
-        ...nearConfig
-      });
-
-      window.walletConnection = new nearApi.WalletConnection(near);
-      window.accountId = walletConnection.getAccountId();
-
-      window.contract = new nearApi.Contract(walletConnection.account(), nearConfig.contractName, {
-        viewMethods: ["getMessages"],
-        changeMethods: ["addMessage"],
-        sender: window.accountId
-      });
-
-      loadMessages();
-    }
-
-    async function loadMessages() {
-      const messages = await contract.getMessages();
-      const container = document.getElementById("messages");
-      container.innerHTML = messages.map(msg => `<p>${msg.text}</p>`).join("");
-    }
-
-    document.getElementById("sendButton").onclick = async () => {
-      const text = document.getElementById("messageInput").value;
-      if (text.trim() === "") return;
-      await contract.addMessage({ text });
-      document.getElementById("messageInput").value = "";
-      loadMessages();
-    };
-
-    initNear();
   </script>
 </body>
 </html>
