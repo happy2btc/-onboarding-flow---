@@ -3,77 +3,102 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>New Paradigm Guest Book</title>
+  <title>New Paradigm Onboarding</title>
   <script src="https://cdn.jsdelivr.net/npm/near-api-js/dist/near-api-js.min.js"></script>
   <style>
     body {
+      background-color: #d4edda;
       font-family: 'Segoe UI', sans-serif;
-      background: #f9f7f6;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
+    }
+
+    .onboarding-box {
+      background-color: #a9dfbf;
       padding: 2rem;
-      color: #333;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 500px;
+      margin-top: 5rem;
     }
-    h1 {
-      margin-bottom: 1rem;
-      color: #4a4a4a;
+
+    .affirm-button, #sendButton {
+      background-color: #28a745;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1rem;
     }
+
+    .hidden {
+      display: none;
+    }
+
+    #guestBookScreen {
+      text-align: center;
+      margin-top: 3rem;
+      width: 90%;
+      max-width: 500px;
+    }
+
     textarea {
       width: 100%;
-      max-width: 400px;
-      height: 100px;
-      margin: 1rem 0;
-      padding: 0.75rem;
+      padding: 1rem;
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 1rem;
-    }
-    button {
-      margin: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      background-color: #6c63ff;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #574fd6;
-    }
-    #messages {
-      margin-top: 2rem;
-      max-width: 500px;
-      width: 100%;
-      text-align: left;
-    }
-    #messages p {
-      background: #fff;
-      padding: 0.75rem;
-      border-radius: 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      margin-bottom: 0.5rem;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
-  <h1>🌱 Welcome to the Guest Book</h1>
-  <button id="sign-in" style="display:none;">Sign In with NEAR</button>
-  <button id="sign-out" style="display:none;">Sign Out</button>
+  <!-- Affirmation Screen -->
+  <div id="affirmationScreen">
+    <div class="onboarding-box">
+      <h1>Welcome to the New Paradigm</h1>
+      <p>We're building a space for authenticity, collaboration, and belonging.<br>Let's begin.</p>
 
-  <textarea id="message" placeholder="Leave an affirmation, greeting, or message..."></textarea>
-  <button onclick="submitMessage()">Send</button>
+      <h2>Affirm Your Values</h2>
+      <form id="affirmationForm">
+        <label><input type="checkbox" checked disabled /> I value authenticity in how I show up.</label><br><br>
+        <label><input type="checkbox" checked disabled /> I believe in collaboration over competition.</label><br><br>
+        <label><input type="checkbox" checked disabled /> I commit to creating belonging for others.</label><br><br>
+        <button type="submit" class="affirm-button">Affirm & Join</button>
+      </form>
+    </div>
+  </div>
 
-  <div id="messages"></div>
+  <!-- Guest Book Screen -->
+  <div id="guestBookScreen" class="hidden">
+    <h2>Leave an Affirmation, Greeting, or Message</h2>
+    <textarea id="messageInput" rows="4" placeholder="Your message..."></textarea><br>
+    <button id="sendButton">Send</button>
+    <div id="messages"></div>
+  </div>
 
   <script>
+    // Transition from affirmation to guest book
+    document.getElementById("affirmationForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      document.getElementById("affirmationScreen").classList.add("hidden");
+      document.getElementById("guestBookScreen").classList.remove("hidden");
+    });
+
+    // NEAR config
     const nearConfig = {
       networkId: "testnet",
       nodeUrl: "https://rpc.testnet.near.org",
       walletUrl: "https://testnet.mynearwallet.com",
       helperUrl: "https://helper.testnet.near.org",
-      contractName: "thomas.testnet" // 🔁 Replace with your actual contract name
+      contractName: "guestbook.thomas.testnet" // 🔁 Replace with your actual contract name
     };
 
     async function initNear() {
@@ -91,19 +116,6 @@
         sender: window.accountId
       });
 
-      if (!window.accountId) {
-        document.getElementById("sign-in").style.display = "inline-block";
-      } else {
-        document.getElementById("sign-out").style.display = "inline-block";
-        loadMessages();
-      }
-    }
-
-    async function submitMessage() {
-      const text = document.getElementById("message").value;
-      if (text.trim() === "") return;
-      await contract.addMessage({ text });
-      document.getElementById("message").value = "";
       loadMessages();
     }
 
@@ -113,10 +125,12 @@
       container.innerHTML = messages.map(msg => `<p>${msg.text}</p>`).join("");
     }
 
-    document.getElementById("sign-in").onclick = () => walletConnection.requestSignIn();
-    document.getElementById("sign-out").onclick = () => {
-      walletConnection.signOut();
-      window.location.reload();
+    document.getElementById("sendButton").onclick = async () => {
+      const text = document.getElementById("messageInput").value;
+      if (text.trim() === "") return;
+      await contract.addMessage({ text });
+      document.getElementById("messageInput").value = "";
+      loadMessages();
     };
 
     initNear();
