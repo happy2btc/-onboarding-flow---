@@ -2,155 +2,124 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>New Paradigm Onboarding</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Paradigm Guest Book</title>
+  <script src="https://cdn.jsdelivr.net/npm/near-api-js/dist/near-api-js.min.js"></script>
   <style>
     body {
-      margin: 0;
-      padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #e6fffa;
+      background: #f9f7f6;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
-    }
-
-    .box {
-      background-color: #d1fae5;
-      border: 2px solid #10b981;
-      border-radius: 16px;
       padding: 2rem;
-      width: 90%;
-      max-width: 500px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      color: #333;
     }
-
     h1 {
-      color: #065f46;
       margin-bottom: 1rem;
+      color: #4a4a4a;
     }
-
-    p {
-      color: #065f46;
-      margin-bottom: 2rem;
-    }
-
-    button {
-      background-color: #10b981;
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
+    textarea {
+      width: 100%;
+      max-width: 400px;
+      height: 100px;
+      margin: 1rem 0;
+      padding: 0.75rem;
       border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      margin: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      background-color: #6c63ff;
+      color: white;
       cursor: pointer;
-      margin-top: 1rem;
     }
-
     button:hover {
-      background-color: #059669;
+      background-color: #574fd6;
     }
-
-    .hidden {
-      display: none;
-    }
-
-    .checkbox-group {
+    #messages {
+      margin-top: 2rem;
+      max-width: 500px;
+      width: 100%;
       text-align: left;
-      margin-top: 1rem;
     }
-
-    label {
-      display: block;
-      margin-bottom: 0.75rem;
-      color: #065f46;
+    #messages p {
+      background: #fff;
+      padding: 0.75rem;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 0.5rem;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>Welcome to the New Paradigm</h1>
-    <p>Connect your wallet and affirm your values to join our community.</p>
+  <h1>🌱 Welcome to the Guest Book</h1>
+  <button id="sign-in" style="display:none;">Sign In with NEAR</button>
+  <button id="sign-out" style="display:none;">Sign Out</button>
 
-    <button id="connectWallet">Connect Wallet</button>
+  <textarea id="message" placeholder="Leave an affirmation, greeting, or message..."></textarea>
+  <button onclick="submitMessage()">Send</button>
 
-    <div id="affirmationSection" class="hidden">
-      <h2>Affirm Your Values</h2>
-      <form id="affirmForm">
-        <div class="checkbox-group">
-          <label><input type="checkbox" name="authenticity" required /> I value authenticity in how I show up.</label>
-          <label><input type="checkbox" name="collaboration" required /> I believe in collaboration over competition.</label>
-          <label><input type="checkbox" name="belonging" required /> I commit to creating belonging for others.</label>
-        </div>
-        <button type="submit">Affirm & Join</button>
-      </form>
-    </div>
-
-    <div id="successMessage" class="hidden">
-      <h2>You're In 💫</h2>
-      <p>Your wallet is connected and your values are affirmed. Welcome to the community.</p>
-    </div>
-  </div>
+  <div id="messages"></div>
 
   <script>
-    let provider;
-    let signer;
-    let contract;
+    const nearConfig = {
+      networkId: "testnet",
+      nodeUrl: "https://rpc.testnet.near.org",
+      walletUrl: "https://testnet.mynearwallet.com",
+      helperUrl: "https://helper.testnet.near.org",
+      contractName: "thomas.testnet" // 🔁 Replace with your actual contract name
+    };
 
-    const connectButton = document.getElementById("connectWallet");
-    const affirmationSection = document.getElementById("affirmationSection");
-    const affirmForm = document.getElementById("affirmForm");
-    const successMessage = document.getElementById("successMessage");
+    async function initNear() {
+      const near = await nearApi.connect({
+        deps: { keyStore: new nearApi.keyStores.BrowserLocalStorageKeyStore() },
+        ...nearConfig
+      });
 
-    connectButton.addEventListener("click", async () => {
-      try {
-        if (!window.ethereum) {
-          alert("MetaMask is not installed.");
-          return;
-        }
+      window.walletConnection = new nearApi.WalletConnection(near);
+      window.accountId = walletConnection.getAccountId();
 
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        signer = provider.getSigner();
+      window.contract = new nearApi.Contract(walletConnection.account(), nearConfig.contractName, {
+        viewMethods: ["getMessages"],
+        changeMethods: ["addMessage"],
+        sender: window.accountId
+      });
 
-        // ✅ Replace with your actual contract address and ABI
-        const contractAddress = "0xYourContractAddressHere";
-        const contractABI = [
-          "function affirmValues() public",
-          "function hasAffirmed(address) view returns (bool)",
-          "event ValuesAffirmed(address indexed member)"
-        ];
-
-        contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-        connectButton.classList.add("hidden");
-        affirmationSection.classList.remove("hidden");
-      } catch (error) {
-        console.error("Connection error:", error);
-        alert("Failed to connect wallet.");
+      if (!window.accountId) {
+        document.getElementById("sign-in").style.display = "inline-block";
+      } else {
+        document.getElementById("sign-out").style.display = "inline-block";
+        loadMessages();
       }
-    });
+    }
 
-    affirmForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const checkboxes = affirmForm.querySelectorAll("input[type='checkbox']");
-      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    async function submitMessage() {
+      const text = document.getElementById("message").value;
+      if (text.trim() === "") return;
+      await contract.addMessage({ text });
+      document.getElementById("message").value = "";
+      loadMessages();
+    }
 
-      if (!allChecked) {
-        alert("Please affirm all values to continue.");
-        return;
-      }
+    async function loadMessages() {
+      const messages = await contract.getMessages();
+      const container = document.getElementById("messages");
+      container.innerHTML = messages.map(msg => `<p>${msg.text}</p>`).join("");
+    }
 
-      try {
-        await contract.affirmValues(); // ⛓️ On-chain call
-        affirmationSection.classList.add("hidden");
-        successMessage.classList.remove("hidden");
-      } catch (error) {
-        console.error("Affirmation error:", error);
-        alert("Transaction failed. Please try again.");
-      }
-    });
+    document.getElementById("sign-in").onclick = () => walletConnection.requestSignIn();
+    document.getElementById("sign-out").onclick = () => {
+      walletConnection.signOut();
+      window.location.reload();
+    };
+
+    initNear();
   </script>
 </body>
 </html>
