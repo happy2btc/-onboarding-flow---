@@ -39,8 +39,7 @@
       margin-bottom: 2rem;
     }
 
-    .connect-button,
-    .affirm-button {
+    button {
       background-color: #059669;
       color: white;
       border: none;
@@ -53,8 +52,7 @@
       width: 100%;
     }
 
-    .connect-button:hover,
-    .affirm-button:hover {
+    button:hover {
       background-color: #047857;
     }
 
@@ -77,29 +75,66 @@
 </head>
 <body>
 
-  <!-- Screen 1: Connect Wallet -->
+  <!-- Screen 1 -->
   <div class="panel" id="screen1">
     <h1>Welcome to the New Paradigm</h1>
     <p>Connect your wallet and affirm your values to join our community.</p>
-    <button class="connect-button" onclick="goToScreen2()">🌿 Connect Wallet</button>
+    <button onclick="connectWallet()">🌿 Connect Wallet</button>
   </div>
 
-  <!-- Screen 2: Affirm Values -->
+  <!-- Screen 2 -->
   <div class="panel" id="screen2">
     <h1>Welcome to the New Paradigm</h1>
     <p>We're building a space for authenticity, collaboration, and belonging. Let's begin.</p>
     <div class="checkbox-group">
-      <label><input type="checkbox" /> I value authenticity in how I show up.</label>
-      <label><input type="checkbox" /> I believe in collaboration over competition.</label>
-      <label><input type="checkbox" /> I commit to creating belonging for others.</label>
+      <label><input type="checkbox" id="val1" /> I value authenticity in how I show up.</label>
+      <label><input type="checkbox" id="val2" /> I believe in collaboration over competition.</label>
+      <label><input type="checkbox" id="val3" /> I commit to creating belonging for others.</label>
     </div>
-    <button class="affirm-button">🌿 Affirm & Join</button>
+    <button onclick="submitAffirmations()">🌿 Affirm & Join</button>
   </div>
 
   <script>
-    function goToScreen2() {
-      document.getElementById('screen1').style.display = 'none';
-      document.getElementById('screen2').style.display = 'block';
+    let userWallet = "";
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userWallet = accounts[0];
+          console.log("Wallet connected:", userWallet);
+
+          // Transition to screen 2
+          document.getElementById('screen1').style.display = 'none';
+          document.getElementById('screen2').style.display = 'block';
+        } catch (error) {
+          alert("Wallet connection failed.");
+          console.error(error);
+        }
+      } else {
+        alert("MetaMask not detected. Please install it to continue.");
+      }
+    }
+
+    function submitAffirmations() {
+      const val1 = document.getElementById('val1').checked;
+      const val2 = document.getElementById('val2').checked;
+      const val3 = document.getElementById('val3').checked;
+
+      const affirmations = {
+        wallet: userWallet,
+        authenticity: val1,
+        collaboration: val2,
+        belonging: val3
+      };
+
+      console.log("Affirmation submitted:", affirmations);
+
+      // 🔮 Placeholder: Trigger smart contract interaction here
+      // Example: send affirmations to guest book contract
+      // contract.methods.signGuestBook(affirmations).send({ from: userWallet });
+
+      alert("Thank you for affirming your values. You're now part of the New Paradigm.");
     }
   </script>
 
