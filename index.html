@@ -3,41 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to the New Paradigm</title>
+  <title>New Paradigm Onboarding</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #d1fae5; /* light green background */
+      background-color: #d1fae5;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
 
-    .welcome-box {
-      background-color: #a7f3d0; /* soft green panel */
+    .panel {
+      background-color: #a7f3d0;
       border: 2px solid #059669;
       border-radius: 16px;
       padding: 2rem 3rem;
       text-align: center;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      max-width: 480px;
+      width: 100%;
     }
 
     h1 {
-      margin: 0;
+      margin-top: 0;
       font-size: 1.8rem;
       color: #065f46;
     }
 
     p {
-      margin: 1rem 0 2rem;
       font-size: 1.1rem;
       color: #065f46;
+      margin-bottom: 2rem;
     }
 
-    .connect-button {
+    .connect-button,
+    .affirm-button {
       background-color: #059669;
       color: white;
       border: none;
@@ -46,20 +49,59 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      margin-top: 1rem;
+      width: 100%;
     }
 
-    .connect-button:hover {
+    .connect-button:hover,
+    .affirm-button:hover {
       background-color: #047857;
+    }
+
+    .checkbox-group {
+      text-align: left;
+      margin-top: 1rem;
+    }
+
+    .checkbox-group label {
+      display: block;
+      margin: 0.75rem 0;
+      color: #065f46;
+      font-size: 1rem;
+    }
+
+    #screen2 {
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="welcome-box">
+  <!-- Screen 1: Connect Wallet -->
+  <div class="panel" id="screen1">
     <h1>Welcome to the New Paradigm</h1>
     <p>Connect your wallet and affirm your values to join our community.</p>
-    <button class="connect-button">🌿 Connect Wallet</button>
+    <button class="connect-button" onclick="goToScreen2()">🌿 Connect Wallet</button>
   </div>
+
+  <!-- Screen 2: Affirm Values -->
+  <div class="panel" id="screen2">
+    <h1>Welcome to the New Paradigm</h1>
+    <p>We're building a space for authenticity, collaboration, and belonging. Let's begin.</p>
+    <div class="checkbox-group">
+      <label><input type="checkbox" /> I value authenticity in how I show up.</label>
+      <label><input type="checkbox" /> I believe in collaboration over competition.</label>
+      <label><input type="checkbox" /> I commit to creating belonging for others.</label>
+    </div>
+    <button class="affirm-button">🌿 Affirm & Join</button>
+  </div>
+
+  <script>
+    function goToScreen2() {
+      document.getElementById('screen1').style.display = 'none';
+      document.getElementById('screen2').style.display = 'block';
+    }
+  </script>
 
 </body>
 </html>
