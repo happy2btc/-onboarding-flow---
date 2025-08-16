@@ -98,7 +98,9 @@
     let userWallet = "";
 
     async function connectWallet() {
-      if (window.ethereum) {
+      console.log("Attempting to connect wallet...");
+
+      if (typeof window.ethereum !== 'undefined') {
         try {
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
           userWallet = accounts[0];
@@ -108,11 +110,12 @@
           document.getElementById('screen1').style.display = 'none';
           document.getElementById('screen2').style.display = 'block';
         } catch (error) {
-          alert("Wallet connection failed.");
-          console.error(error);
+          console.error("Wallet connection error:", error);
+          alert("Wallet connection failed. Please try again.");
         }
       } else {
         alert("MetaMask not detected. Please install it to continue.");
+        console.warn("window.ethereum is undefined.");
       }
     }
 
