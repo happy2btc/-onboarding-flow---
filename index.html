@@ -10,20 +10,20 @@
       background-color: #f0fdf4;
       margin: 0;
       padding: 2rem;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
     .panel {
       background-color: #d1fae5;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-
-    .panel.white {
-      background-color: #ffffff;
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      text-align: center;
     }
 
     h2 {
@@ -32,26 +32,20 @@
     }
 
     p {
-      margin: 0.5rem 0 1rem;
       color: #065f46;
-    }
-
-    .checkbox-group label {
-      display: block;
-      margin: 0.5rem 0;
-      color: #065f46;
+      margin-bottom: 1rem;
     }
 
     input[type="text"] {
       width: 100%;
       padding: 0.75rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       border: 1px solid #a7f3d0;
       border-radius: 8px;
       font-size: 1rem;
     }
 
-    button {
+    .connect-button {
       background-color: #059669;
       color: white;
       border: none;
@@ -59,78 +53,30 @@
       border-radius: 8px;
       font-size: 1rem;
       cursor: pointer;
-      margin-top: 0.5rem;
-    }
-
-    .wallet-buttons button {
-      display: block;
       width: 100%;
-      margin: 0.5rem 0;
-      background-color: #4c1d95;
+      transition: background-color 0.3s ease;
     }
 
-    .wallet-buttons button:nth-child(2) {
-      background-color: #1e40af;
-    }
-
-    .wallet-buttons button:nth-child(3) {
-      background-color: #065f46;
+    .connect-button:hover {
+      background-color: #047857;
     }
 
     .footer-text {
       margin-top: 1rem;
       font-size: 0.9rem;
       color: #065f46;
-      text-align: center;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Left Panel -->
   <div class="panel">
-    <h2>Welcome to the New Paradigm</h2>
-    <p>Connect your wallet and affirm your values to join our community.</p>
-    <button>Connect Wallet</button>
-  </div>
-
-  <!-- Top Right Panel -->
-  <div class="panel">
-    <h2>Welcome to the New Paradigm</h2>
-    <p>Connect your wallet and affirm your values to join our community.</p>
-    <div class="checkbox-group">
-      <label><input type="checkbox" /> I value authenticity in how I show up.</label>
-      <label><input type="checkbox" /> I believe in collaboration over competition.</label>
-      <label><input type="checkbox" /> I commit to creating belonging for others.</label>
-    </div>
-    <button>Affirm & Join</button>
-  </div>
-
-  <!-- Bottom Left Panel -->
-  <div class="panel white">
     <h2>🌿 Welcome to the New Paradigm</h2>
     <p>You belong here. Your presence is a gift.</p>
     <input type="text" placeholder="Affirm your intention..." />
-    <div class="wallet-buttons">
-      <button>🔒 Connect with MetaMask</button>
-      <button>📱 WalletConnect (coming soon)</button>
-      <button>🌿 NEAR Wallet (coming soon)</button>
-    </div>
-    <div class="footer-text">Choose the key that feels right. Your wallet is your voice.</div>
-  </div>
-
-  <!-- Bottom Right Panel -->
-  <div class="panel white">
-    <h2>🌿 Welcome to the New Paradigm</h2>
-    <p>You belong here. Your presence is a gift.</p>
-    <input type="text" placeholder="I commit to be authentic" />
-    <div class="wallet-buttons">
-      <button>🔒 Connect with MetaMask</button>
-      <button>📱 WalletConnect (coming soon)</button>
-      <button>🌿 NEAR Wallet (coming soon)</button>
-    </div>
+    <button class="connect-button">🌿 Connect Wallet</button>
     <div class="footer-text">Choose the key that feels right. Your wallet is your voice.</div>
   </div>
 
 </body>
-</html>tml>
+</html>>
