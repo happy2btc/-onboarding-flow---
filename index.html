@@ -3,80 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>New Paradigm Onboarding</title>
+  <title>Welcome to the New Paradigm</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f0fdf4;
       margin: 0;
-      padding: 2rem;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #d1fae5; /* light green background */
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
 
-    .panel {
-      background-color: #d1fae5;
+    .welcome-box {
+      background-color: #a7f3d0; /* soft green panel */
+      border: 2px solid #059669;
       border-radius: 16px;
-      padding: 2rem;
-      max-width: 480px;
-      width: 100%;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      padding: 2rem 3rem;
       text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
     }
 
-    h2 {
-      margin-top: 0;
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
       color: #065f46;
     }
 
     p {
+      margin: 1rem 0 2rem;
+      font-size: 1.1rem;
       color: #065f46;
-      margin-bottom: 1rem;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1.5rem;
-      border: 1px solid #a7f3d0;
-      border-radius: 8px;
-      font-size: 1rem;
     }
 
     .connect-button {
       background-color: #059669;
       color: white;
       border: none;
-      padding: 0.75rem 1.25rem;
-      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
       font-size: 1rem;
+      border-radius: 8px;
       cursor: pointer;
-      width: 100%;
       transition: background-color 0.3s ease;
     }
 
     .connect-button:hover {
       background-color: #047857;
     }
-
-    .footer-text {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #065f46;
-    }
   </style>
 </head>
 <body>
 
-  <div class="panel">
-    <h2>🌿 Welcome to the New Paradigm</h2>
-    <p>You belong here. Your presence is a gift.</p>
-    <input type="text" placeholder="Affirm your intention..." />
+  <div class="welcome-box">
+    <h1>Welcome to the New Paradigm</h1>
+    <p>Connect your wallet and affirm your values to join our community.</p>
     <button class="connect-button">🌿 Connect Wallet</button>
-    <div class="footer-text">Choose the key that feels right. Your wallet is your voice.</div>
   </div>
 
 </body>
-</html>>
+</html>
