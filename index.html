@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>New Paradigm Onboarding</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -25,6 +26,12 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
       max-width: 480px;
       width: 100%;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .panel.visible {
+      opacity: 1;
     }
 
     h1 {
@@ -68,15 +75,24 @@
       font-size: 1rem;
     }
 
-    #screen2 {
+    #confirmation {
       display: none;
+      font-size: 1.2rem;
+      color: #065f46;
+      margin-top: 2rem;
+      animation: fadeIn 2s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
 
   <!-- Screen 1 -->
-  <div class="panel" id="screen1">
+  <div class="panel visible" id="screen1">
     <h1>Welcome to the New Paradigm</h1>
     <p>Connect your wallet and affirm your values to join our community.</p>
     <button onclick="connectWallet()">🌿 Connect Wallet</button>
@@ -91,15 +107,14 @@
       <label><input type="checkbox" id="val2" /> I believe in collaboration over competition.</label>
       <label><input type="checkbox" id="val3" /> I commit to creating belonging for others.</label>
     </div>
-    <button onclick="submitAffirmations()">🌿 Affirm & Join</button>
+    <button onclick="submitAffirmations()">🌿 Affirm & Mint</button>
+    <div id="confirmation">🌈 Your values are now soulbound. Welcome to the New Paradigm.</div>
   </div>
 
   <script>
     let userWallet = "";
 
     async function connectWallet() {
-      console.log("Attempting to connect wallet...");
-
       if (typeof window.ethereum !== 'undefined') {
         try {
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -107,37 +122,59 @@
           console.log("Wallet connected:", userWallet);
 
           // Transition to screen 2
+          document.getElementById('screen1').classList.remove('visible');
           document.getElementById('screen1').style.display = 'none';
-          document.getElementById('screen2').style.display = 'block';
+          const screen2 = document.getElementById('screen2');
+          screen2.style.display = 'block';
+          setTimeout(() => screen2.classList.add('visible'), 100);
         } catch (error) {
-          console.error("Wallet connection error:", error);
-          alert("Wallet connection failed. Please try again.");
+          alert("Wallet connection failed.");
+          console.error(error);
         }
       } else {
         alert("MetaMask not detected. Please install it to continue.");
-        console.warn("window.ethereum is undefined.");
       }
     }
 
-    function submitAffirmations() {
+    async function submitAffirmations() {
       const val1 = document.getElementById('val1').checked;
       const val2 = document.getElementById('val2').checked;
       const val3 = document.getElementById('val3').checked;
 
-      const affirmations = {
+      const timestamp = new Date().toISOString();
+      const message = "🌈 I show up with love";
+
+      const metadata = {
         wallet: userWallet,
         authenticity: val1,
         collaboration: val2,
-        belonging: val3
+        belonging: val3,
+        timestamp: timestamp,
+        message: message
       };
 
-      console.log("Affirmation submitted:", affirmations);
+      console.log("Affirmation submitted:", metadata);
 
-      // 🔮 Placeholder: Trigger smart contract interaction here
-      // Example: send affirmations to guest book contract
-      // contract.methods.signGuestBook(affirmations).send({ from: userWallet });
+      // 🔮 Replace with your deployed contract address and ABI
+      const contractAddress = "0xYourContractAddress";
+      const abi = [ /* Your ABI here */ ];
 
-      alert("Thank you for affirming your values. You're now part of the New Paradigm.");
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+
+        // Replace with your actual tokenURI (IPFS or backend)
+        const tokenURI = "https://yourdomain.com/metadata/affirmation.json";
+
+        await contract.mintAffirmation(userWallet, tokenURI);
+        console.log("Soulbound token minted!");
+
+        document.getElementById('confirmation').style.display = 'block';
+      } catch (err) {
+        console.error("Minting failed:", err);
+        alert("Minting failed. Please try again.");
+      }
     }
   </script>
 
